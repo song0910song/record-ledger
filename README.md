@@ -47,7 +47,7 @@ export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
 
 ## 一、安装到手机
 
-1. 把 `记账-v1.2.0.apk` 传到手机（微信文件传输 / QQ / 数据线均可）
+1. 到 [Releases](https://github.com/song0910song/record-ledger/releases/latest) 下载 `record-ledger-v1.2.0.apk`，传到手机（微信文件传输 / QQ / 数据线均可）
 2. 手机上点开这个 apk 文件
 3. 系统会提示「禁止安装未知来源应用」→ 点**设置** → 允许来自此来源
 4. 继续安装 → 桌面出现绿色图标「记账」
