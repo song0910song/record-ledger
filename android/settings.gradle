@@ -1,0 +1,42 @@
+include ':app'
+
+def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
+def properties = new Properties()
+
+assert localPropertiesFile.exists()
+localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
+
+def flutterSdkPath = properties.getProperty("flutter.sdk")
+assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
+
+// ---------------------------------------------------------------------------
+// 网络适配：本地环境无法访问 dl.google.com / repo.maven.apache.org。
+// 在任何项目被评估之前，把国内镜像仓库插入其 buildscript / 依赖仓库的最前面。
+// 脚本块（script handler）是活的，这里的 add 会立即生效。
+// ---------------------------------------------------------------------------
+gradle.beforeProject { proj ->
+    def addMirrors = { handler ->
+        [
+            'https://maven.aliyun.com/repository/google',
+            'https://maven.aliyun.com/repository/public',
+            'https://maven.aliyun.com/repository/gradle-plugin',
+            'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/',
+        ].reverseEach { u ->
+            // 逆序插入，保证排列后 aliyun-google 位于首位
+            handler.maven { url u }
+        }
+    }
+    addMirrors(proj.buildscript.repositories)
+    addMirrors(proj.repositories)
+}
+
+gradle.settingsEvaluated { settings ->
+    [
+        'https://maven.aliyun.com/repository/google',
+        'https://maven.aliyun.com/repository/public',
+        'https://maven.aliyun.com/repository/gradle-plugin',
+    ].reverseEach { u ->
+        settings.pluginManagement.repositories.maven { url u }
+    }
+}

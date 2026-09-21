@@ -1,0 +1,40 @@
+# ---- Flutter / Dart ----
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+
+# ---- Android ----
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/key.properties
+android/.idea/
+android/captures/
+*.jks
+*.keystore
+
+# ---- IDE ----
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ---- 系统 ----
+.DS_Store
+Thumbs.db
+
+# ---- 构建产物 ----
+*.apk
+*.aab
+*.ipa
+
+# ---- 本地数据 ----
+*.db
+*.sqlite
+ledger_export_*.csv

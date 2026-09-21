@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        // 国内镜像优先，google() 在此网络下不可达
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.2'
+        // Kotlin 编译插件 —— MainActivity.kt 需要它才能编译成 dex 里的类。
+        // 缺了它，AndroidManifest 里声明的入口 Activity 不存在，App 启动即闪退。
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.22"
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

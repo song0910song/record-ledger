@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>记账 · 界面预览</title>
+<style>
+  :root{
+    --primary:#00B894; --primary-light:#E6F9F4;
+    --expense:#E85D5D; --income:#00B894;
+    --warn:#F5A623; --danger:#E84C3D;
+    --bg:#F7F8FA; --card:#FFFFFF;
+    --text-main:#1F2430; --text-sub:#8A93A5; --divider:#EDEFF3;
+    --c0:#00B894; --c1:#6C8AE4; --c2:#F5A623; --c3:#E8686B;
+    --c4:#9B6CE4; --c5:#4BC0C0; --c6:#E48A6C; --c7:#5BA8E4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:#E9EBF0; color:var(--text-main);
+    display:flex; justify-content:center; align-items:flex-start;
+    min-height:100vh; padding:28px 16px; gap:28px; flex-wrap:wrap;
+  }
+
+  /* ====== 手机外壳 ====== */
+  .phone{
+    width:320px; height:660px; background:var(--bg);
+    border-radius:30px; overflow:hidden; position:relative;
+    box-shadow:0 20px 50px rgba(31,36,48,.18), 0 0 0 9px #1a1d24, 0 0 0 11px #2b2f38;
+    display:flex; flex-direction:column;
+  }
+  .caption{
+    text-align:center; font-size:12px; color:var(--text-sub);
+    margin-top:14px; letter-spacing:.4px; font-weight:600;
+  }
+  .cap-wrap{display:flex;flex-direction:column;align-items:center}
+
+  .statusbar{
+    height:26px; flex:0 0 26px; display:flex; align-items:center;
+    justify-content:space-between; padding:0 18px;
+    font-size:10.5px; font-weight:600; color:var(--text-main);
+  }
+  .statusbar .dots{display:flex;gap:3px;align-items:center}
+  .statusbar .dots i{width:3px;height:3px;border-radius:50%;background:var(--text-main);display:block;opacity:.75}
+
+  .screen{flex:1; overflow:hidden; position:relative; display:flex; flex-direction:column}
+
+  /* ====== 通用 ====== */
+  .scroll{flex:1; overflow-y:auto; overflow-x:hidden}
+  .scroll::-webkit-scrollbar{width:0}
+  .card{background:#fff; border-radius:16px}
+  .muted{color:var(--text-sub)}
+  .row{display:flex; align-items:center}
+  .spacer{flex:1}
+
+  /* ====== 页头 ====== */
+  .pagehead{padding:14px 20px 4px; display:flex; align-items:center; gap:6px}
+  .pagehead h1{font-size:20px; font-weight:700}
+  .monthnav{margin-left:auto; display:flex; align-items:center; gap:2px; font-size:13px; font-weight:600}
+  .chev{width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--text-sub);font-size:15px}
+
+  /* 账单页月份标题 */
+  .mhead{padding:14px 14px 4px; display:flex; align-items:center}
+  .mhead .t{flex:1; text-align:center; font-size:17px; font-weight:700}
+
+  /* ====== 概览卡 ====== */
+  .overview{margin:4px 16px 12px; padding:20px; background:#fff; border-radius:18px; text-align:center}
+  .overview .lbl{font-size:13px; color:var(--text-sub)}
+  .overview .big{font-size:34px; font-weight:700; letter-spacing:-.5px; margin-top:6px}
+  .ministats{display:flex; align-items:center; margin-top:18px}
+  .ministat{flex:1}
+  .ministat .k{font-size:12px; color:var(--text-sub)}
+  .ministat .v{font-size:17px; font-weight:600; margin-top:4px}
+  .vline{width:1px; height:30px; background:var(--divider)}
+
+  /* ====== 预算进度条(账单页) ====== */
+  .budbar{margin:0 16px 12px; padding:14px 16px 16px; background:#fff; border-radius:16px}
+  .budbar .top{display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600}
+  .budbar .top .r{margin-left:auto; font-size:12px}
+  .track{height:6px; border-radius:4px; background:var(--divider); margin-top:10px; overflow:hidden}
+  .track i{display:block; height:100%; border-radius:4px}
+  .budbar .foot{font-size:11px; color:var(--text-sub); margin-top:6px}
+
+  /* ====== 日期分组 ====== */
+  .dayhead{padding:14px 20px 6px; display:flex; align-items:center; gap:6px}
+  .dayhead .d{font-size:13px; font-weight:600}
+  .dayhead .w{font-size:12px; color:var(--text-sub)}
+  .dayhead .sum{margin-left:auto; font-size:11px; color:var(--text-sub)}
+  .daycard{margin:0 16px; background:#fff; border-radius:14px; overflow:hidden}
+
+  .txn{padding:12px 14px; display:flex; align-items:center; gap:10px}
+  .txn .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex:0 0 34px}
+  .txn .mid{flex:1; min-width:0}
+  .txn .nm{font-size:14px; font-weight:500}
+  .txn .note{font-size:11px; color:var(--text-sub); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .txn .amt{text-align:right}
+  .txn .amt .a{font-size:15px; font-weight:600}
+  .txn .amt .t{font-size:10px; color:var(--text-sub); margin-top:2px}
+  .sep{margin-left:58px; height:1px; background:var(--divider)}
+
+  /* ====== 底部导航 ====== */
+  .tabbar{
+    flex:0 0 62px; background:#fff; border-top:1px solid var(--divider);
+    display:flex; align-items:center; position:relative;
+  }
+  .tab{flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+       font-size:11px; color:var(--text-sub); cursor:pointer}
+  .tab.on{color:var(--primary); font-weight:600}
+  .tab .ti{font-size:19px; line-height:1}
+  .fabspace{width:62px; flex:0 0 62px}
+  .fab{
+    position:absolute; left:50%; transform:translateX(-50%); top:-24px;
+    width:62px;height:62px;border-radius:50%;background:var(--primary);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:30px;font-weight:300;
+    box-shadow:0 6px 16px rgba(0,184,148,.42);
+  }
+  .notch{
+    position:absolute; left:50%; transform:translateX(-50%); top:-1px;
+    width:88px; height:26px; background:var(--bg);
+    border-radius:0 0 46px 46px;
+  }
+
+  /* ====== 统计页 ====== */
+  .sumrow{display:flex; gap:10px; padding:4px 16px 0}
+  .sumcard{flex:1; background:#fff; border-radius:14px; padding:12px}
+  .sumcard .k{font-size:11px; color:var(--text-sub)}
+  .sumcard .v{font-size:17px; font-weight:700; margin-top:6px}
+  .sec{margin:16px 16px 0; background:#fff; border-radius:16px; padding:16px 18px}
+  .sec h3{font-size:14px; font-weight:700}
+  .sec .sub{font-size:12px; color:var(--text-sub); margin-top:6px}
+  .donutwrap{display:flex; align-items:center; gap:10px; margin-top:14px; height:190px}
+  .legend{flex:1; display:flex; flex-direction:column; gap:6px; font-size:11.5px}
+  .legend .li{display:flex; align-items:center; gap:6px}
+  .legend .li .sq{width:7px;height:7px;border-radius:2px;flex:0 0 7px}
+  .legend .li .pct{margin-left:auto; color:var(--text-sub); font-size:11px}
+
+  .rank{margin-bottom:14px}
+  .rank .rt{display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500}
+  .rank .rt .val{margin-left:auto; font-weight:600}
+  .rank .bar{height:5px; border-radius:3px; background:var(--divider); margin-top:6px; overflow:hidden}
+  .rank .bar i{display:block;height:100%;border-radius:3px}
+
+  .bars{display:flex; align-items:flex-end; gap:0; height:150px; margin-top:16px;
+        padding-bottom:26px; position:relative}
+  .barcol{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; position:relative}
+  .barcol .b{width:16px; border-radius:4px 4px 0 0}
+  .barcol .l{position:absolute; bottom:-22px; font-size:10px; color:var(--text-sub)}
+  .gridlines{position:absolute; inset:0 0 26px 0; display:flex; flex-direction:column; justify-content:space-between; pointer-events:none}
+  .gridlines i{display:block; height:1px; background:var(--divider)}
+
+  /* ====== 预算页 ====== */
+  .bigcard{margin:4px 16px 0; padding:20px; border-radius:18px; color:#fff}
+  .bigcard .k{font-size:12px; color:rgba(255,255,255,.72)}
+  .bigcard .amt{font-size:30px; font-weight:700; letter-spacing:-.5px; margin-top:8px}
+  .badge{font-size:10px; font-weight:600; padding:3px 8px; border-radius:10px; background:rgba(255,255,255,.22)}
+  .ovtrack{height:5px; border-radius:3px; background:rgba(255,255,255,.24); margin-top:14px; overflow:hidden}
+  .ovtrack i{display:block;height:100%;background:#fff;border-radius:3px}
+  .ovstats{display:flex; margin-top:10px}
+  .ovstats > div{flex:1; text-align:left}
+  .ovstats .k{font-size:10px; color:rgba(255,255,255,.6)}
+  .ovstats .v{font-size:15px; font-weight:600; color:#fff; margin-top:2px}
+  .todaybox{margin-top:14px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.16);
+            display:flex; align-items:center; gap:8px; font-size:12px}
+  .todaybox .k{color:rgba(255,255,255,.72)}
+  .todaybox .v{margin-left:auto; font-size:17px; font-weight:700}
+  .todaybox .s{font-size:11px; color:rgba(255,255,255,.6)}
+
+  .btile{margin:0 16px 8px; padding:12px 14px; background:#fff; border-radius:14px}
+  .btile.over{border:1px solid rgba(232,76,61,.35)}
+  .btile .tr{display:flex; align-items:center; gap:10px}
+  .btile .ci{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 32px}
+  .btile .nm{font-size:14px; font-weight:600; flex:1}
+  .btile .num{font-size:14px; font-weight:700}
+  .btile .den{font-size:12px; color:var(--text-sub)}
+  .btile .track{margin-top:10px}
+  .btile .ft{display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; margin-top:6px}
+  .btile .ft .p{margin-left:auto; color:var(--text-sub); font-weight:400}
+  .setlink{font-size:12px; color:var(--primary); font-weight:600}
+
+  .secttl{margin:18px 16px 8px; font-size:14px; font-weight:700; padding-left:4px}
+
+  .tip{margin:16px; padding:14px; border-radius:12px; background:var(--primary-light)}
+  .tip .h{font-size:12px; font-weight:700; color:var(--primary); display:flex; align-items:center; gap:6px}
+  .tip .b{font-size:11.5px; line-height:1.6; margin-top:4px; padding-left:21px}
+
+  /* ====== 我的页 ====== */
+  .profile{margin:0 16px 20px; padding:20px; border-radius:18px;
+           background:linear-gradient(135deg,#00B894,#00A383); color:#fff;
+           display:flex; align-items:center; gap:14px}
+  .profile .k{font-size:12px; color:rgba(255,255,255,.72)}
+  .profile .n{font-size:24px; font-weight:700; margin-top:2px}
+  .profile .r{margin-left:auto; text-align:right}
+  .profile .r .s{font-size:11px; color:rgba(255,255,255,.72); margin-top:2px}
+  .profile .r .s2{font-size:11px; font-weight:600}
+
+  .menu{margin:0 16px; background:#fff; border-radius:16px; overflow:hidden}
+  .mitem{padding:14px 16px; display:flex; align-items:center; gap:12px}
+  .mitem .mi{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 30px}
+  .mitem .mm{flex:1}
+  .mitem .mt{font-size:14px; font-weight:500}
+  .mitem .ms{font-size:11px; color:var(--text-sub); margin-top:2px}
+  .mitem .mc{color:var(--text-sub); font-size:16px}
+  .mline{margin-left:56px; height:1px; background:var(--divider)}
+
+  .foot-note{text-align:center; font-size:11px; color:var(--text-sub); margin-top:24px}
+
+  /* 记一笔页 */
+  .addwrap{flex:1; background:#fff; display:flex; flex-direction:column}
+  .addhead{padding:14px 16px 4px; display:flex; align-items:center; justify-content:space-between}
+  .addhead .x{font-size:18px; color:var(--text-sub)}
+  .addhead .ttl{font-size:16px; font-weight:600}
+  .addhead .time{font-size:12px; color:var(--text-sub)}
+  .typeswitch{padding:4px 16px; display:flex; gap:8px}
+  .tbtn{padding:7px 18px; border-radius:20px; font-size:13px; font-weight:600;
+        background:var(--bg); color:var(--text-sub)}
+  .tbtn.on0{background:var(--expense); color:#fff}
+  .tbtn.on1{background:var(--income); color:#fff}
+  .amtline{padding:10px 20px 6px; display:flex; align-items:baseline; gap:6px}
+  .amtline .cur{font-size:22px; font-weight:600; color:var(--c3)}
+  .amtline .num{font-size:40px; font-weight:700; letter-spacing:-1px}
+  .chip{margin-left:auto; padding:5px 10px; border-radius:8px; font-size:12px; font-weight:600;
+        background:rgba(232,104,107,.12); color:var(--c3); display:flex; align-items:center; gap:5px}
+  .noteline{padding:0 20px 12px; display:flex; align-items:center; gap:4px;
+            font-size:13px; color:var(--text-sub); border-bottom:1px solid var(--divider)}
+  .catgrid{display:grid; grid-template-columns:repeat(5,1fr); gap:4px; padding:14px 16px}
+  .citem{display:flex; flex-direction:column; align-items:center; gap:5px; font-size:11px; color:var(--text-sub)}
+  .citem .ci{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .citem.on .ci{color:#fff!important}
+  .citem.on{color:var(--text-main); font-weight:600}
+  .keypad{background:#FAFBFC; padding:6px 6px 0}
+  .krow{display:flex}
+  .key{flex:1; height:46px; display:flex; align-items:center; justify-content:center;
+       font-size:22px; font-weight:500; cursor:pointer}
+  .key.del{font-size:18px; color:var(--text-sub)}
+  .savebar{background:#FAFBFC; padding:6px 16px 10px}
+  .savebtn{height:46px; border-radius:12px; background:var(--c3); color:#fff;
+           display:flex; align-items:center; justify-content:center;
+           font-size:15px; font-weight:600}
+
+  .hint{font-size:11px; color:var(--text-sub); text-align:center; margin-top:8px}
+  .page-title{width:100%; text-align:center; font-size:15px; font-weight:700;
+              color:#3A4152; margin-bottom:6px}
+
+  /* ====== 支付确认弹窗 ====== */
+  .dim{position:absolute; inset:0; background:rgba(20,24,32,.42); z-index:9}
+  .sheet{position:absolute; left:0; right:0; bottom:0; z-index:10;
+         background:#fff; border-radius:22px 22px 0 0; padding:8px 0 0;
+         box-shadow:0 -8px 30px rgba(31,36,48,.18)}
+  .sheet .grab{width:36px;height:4px;border-radius:2px;background:var(--divider);
+               margin:0 auto 12px}
+  .sheet .hd{padding:0 20px 4px; display:flex; align-items:center; gap:8px}
+  .sheet .hd .ic{width:30px;height:30px;border-radius:9px;display:flex;
+                 align-items:center;justify-content:center;font-size:15px;
+                 background:rgba(0,184,148,.12);color:var(--primary)}
+  .sheet .hd .t{font-size:14px; font-weight:700}
+  .sheet .hd .tag{margin-left:auto; font-size:10px; font-weight:600; padding:3px 8px;
+                  border-radius:9px; background:var(--primary-light); color:var(--primary)}
+  .sheet .amt{padding:10px 20px 2px; display:flex; align-items:baseline; gap:5px}
+  .sheet .amt .cur{font-size:19px; font-weight:600; color:var(--c3)}
+  .sheet .amt .num{font-size:36px; font-weight:700; letter-spacing:-1px}
+  .sheet .fields{padding:8px 20px 0}
+  .frow{padding:11px 0; display:flex; align-items:center; gap:10px;
+        border-bottom:1px solid var(--divider); font-size:13px}
+  .frow .fl{width:52px; color:var(--text-sub); flex:0 0 52px}
+  .frow .fv{flex:1; font-weight:500}
+  .frow .fc{color:var(--text-sub); font-size:15px}
+  .frow .src{font-size:11px; font-weight:600; padding:3px 8px; border-radius:9px;
+             background:rgba(108,138,228,.12); color:var(--c1)}
+  .rawbox{margin:12px 20px 0; padding:10px 12px; border-radius:11px;
+          background:#FAFBFC; font-size:11px; color:var(--text-sub); line-height:1.55}
+  .rawbox b{display:block; font-size:10.5px; color:var(--warn); margin-bottom:4px}
+  .sheetbtns{display:flex; gap:10px; padding:14px 20px 18px}
+  .sbtn{flex:1; height:46px; border-radius:13px; display:flex; align-items:center;
+        justify-content:center; font-size:15px; font-weight:600}
+  .sbtn.ghost{background:var(--bg); color:var(--text-sub)}
+  .sbtn.prim{background:var(--primary); color:#fff; box-shadow:0 4px 12px rgba(0,184,148,.3)}
+
+  /* ====== 支付感应设置页 ====== */
+  .stepcard{margin:0 16px 8px; padding:14px 16px; background:#fff; border-radius:14px;
+            display:flex; gap:12px}
+  .stepcard .sn{width:24px;height:24px;border-radius:50%;flex:0 0 24px;
+                background:var(--primary-light); color:var(--primary);
+                display:flex;align-items:center;justify-content:center;
+                font-size:12px;font-weight:700}
+  .stepcard .st{font-size:13.5px; font-weight:600}
+  .stepcard .sb{font-size:11.5px; color:var(--text-sub); margin-top:4px; line-height:1.6}
+  .cta{margin:14px 16px 0; height:48px; border-radius:13px; background:var(--primary);
+       color:#fff; display:flex; align-items:center; justify-content:center;
+       font-size:15px; font-weight:600; box-shadow:0 5px 14px rgba(0,184,148,.32)}
+  .cta.done{background:var(--primary-light); color:var(--primary); box-shadow:none}
+  .switchrow{margin:14px 16px 0; padding:14px 16px; background:#fff; border-radius:14px;
+             display:flex; align-items:center; gap:10px}
+  .switchrow .st{font-size:14px; font-weight:600}
+  .switchrow .sb{font-size:11px; color:var(--text-sub); margin-top:3px}
+  .sw{margin-left:auto; width:44px; height:26px; border-radius:13px; background:var(--primary);
+      position:relative; flex:0 0 44px}
+  .sw i{position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%;
+        background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .sw.off{background:var(--divider)}
+  .sw.off i{left:3px; right:auto}
+  .faq{margin:0 16px; background:#fff; border-radius:14px; overflow:hidden}
+  .q{padding:13px 16px; font-size:12.5px; font-weight:600}
+  .a{padding:0 16px 13px; font-size:11.5px; color:var(--text-sub); line-height:1.65}
+</style>
+</head>
+<body>
+
+<!-- ============ 1. 账单页 ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="dots"><i></i><i></i><i></i></span>
+  </div>
+  <div class="screen">
+    <div class="mhead">
+      <span class="chev">‹</span>
+      <span class="t">2026年9月</span>
+      <span class="chev" style="opacity:.3">›</span>
+    </div>
+    <div class="scroll">
+      <div class="overview">
+        <div class="lbl">本月结余</div>
+        <div class="big">¥3,860</div>
+        <div class="ministats">
+          <div class="ministat"><div class="k">支出</div><div class="v" style="color:var(--expense)">4,140</div></div>
+          <div class="vline"></div>
+          <div class="ministat"><div class="k">收入</div><div class="v" style="color:var(--income)">8,000</div></div>
+        </div>
+      </div>
+
+      <!-- 预算进度条：核心卖点 -->
+      <div class="budbar">
+        <div class="top" style="color:var(--warn)">
+          <span>◔</span><span>预算进度</span>
+          <span class="r">还剩 ¥1,360</span>
+        </div>
+        <div class="track"><i style="width:79%;background:var(--warn)"></i></div>
+        <div class="foot">已花 5,640 / 7,000</div>
+      </div>
+
+      <div class="dayhead">
+        <span class="d">今天</span><span class="w">周一</span>
+        <span class="sum">支出 92</span>
+      </div>
+      <div class="daycard">
+        <div class="txn">
+          <div class="ic" style="background:rgba(232,104,107,.12);color:var(--c3)">餐</div>
+          <div class="mid"><div class="nm">餐饮</div><div class="note">楼下沙县 · 午饭</div></div>
+          <div class="amt"><div class="a" style="color:var(--text-main)">-32</div><div class="t">12:30</div></div>
+        </div>
+        <div class="sep"></div>
+        <div class="txn">
+          <div class="ic" style="background:rgba(108,138,228,.12);color:var(--c1)">交</div>
+          <div class="mid"><div class="nm">交通</div><div class="note">地铁通勤</div></div>
+          <div class="amt"><div class="a" style="color:var(--text-main)">-6</div><div class="t">08:15</div></div>
+        </div>
+        <div class="sep"></div>
+        <div class="txn">
+          <div class="ic" style="background:rgba(245,166,35,.12);color:var(--c2)">购</div>
+          <div class="mid"><div class="nm">购物</div><div class="note">洗手液 + 纸巾</div></div>
+          <div class="amt"><div class="a" style="color:var(--text-main)">-54</div><div class="t">19:02</div></div>
+        </div>
+      </div>
+
+      <div class="dayhead">
+        <span class="d">昨天</span><span class="w">周日</span>
+        <span class="sum">支出 86 · 收入 8,000</span>
+      </div>
+      <div class="daycard">
+        <div class="txn">
+          <div class="ic" style="background:rgba(0,184,148,.12);color:var(--c0)">工</div>
+          <div class="mid"><div class="nm">工资</div><div class="note">9月工资到账</div></div>
+          <div class="amt"><div class="a" style="color:var(--income)">+8,000</div><div class="t">10:00</div></div>
+        </div>
+        <div class="sep"></div>
+        <div class="txn">
+          <div class="ic" style="background:rgba(155,108,228,.12);color:var(--c4)">娱</div>
+          <div class="mid"><div class="nm">娱乐</div><div class="note">电影票</div></div>
+          <div class="amt"><div class="a" style="color:var(--text-main)">-86</div><div class="t">20:40</div></div>
+        </div>
+      </div>
+      <div style="height:100px"></div>
+
+      <div class="tabbar">
+        <div class="notch"></div>
+        <div class="fab">+</div>
+        <div class="tab on"><span class="ti">▤</span>账单</div>
+        <div class="tab"><span class="ti">◑</span>统计</div>
+        <div class="fabspace"></div>
+        <div class="tab"><span class="ti">▱</span>预算</div>
+        <div class="tab"><span class="ti">◔</span>我的</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="caption">① 账单页 · 月度概览 + 预算进度</div>
+</div>
+
+<!-- ============ 2. 记一笔 ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar"><span>9:42</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="screen">
+    <div class="addwrap">
+      <div class="addhead">
+        <span class="x">✕</span>
+        <span class="ttl">记一笔</span>
+        <span class="time">◷ 12:30</span>
+      </div>
+      <div class="typeswitch">
+        <span class="tbtn on0">支出</span>
+        <span class="tbtn">收入</span>
+      </div>
+      <div class="amtline">
+        <span class="cur">¥</span>
+        <span class="num">32</span>
+        <span class="chip">餐 · 餐饮</span>
+      </div>
+      <div class="noteline"><span>✎</span> 备注（可选）</div>
+      <div class="catgrid">
+        <div class="citem on"><div class="ci" style="background:var(--c3);color:#fff">餐</div>餐饮</div>
+        <div class="citem"><div class="ci" style="background:rgba(108,138,228,.1);color:var(--c1)">交</div>交通</div>
+        <div class="citem"><div class="ci" style="background:rgba(245,166,35,.1);color:var(--c2)">购</div>购物</div>
+        <div class="citem"><div class="ci" style="background:rgba(0,184,148,.1);color:var(--c0)">住</div>居住</div>
+        <div class="citem"><div class="ci" style="background:rgba(155,108,228,.1);color:var(--c4)">娱</div>娱乐</div>
+        <div class="citem"><div class="ci" style="background:rgba(91,168,228,.1);color:var(--c7)">医</div>医疗</div>
+        <div class="citem"><div class="ci" style="background:rgba(75,192,192,.1);color:var(--c5)">讯</div>通讯</div>
+        <div class="citem"><div class="ci" style="background:rgba(228,138,108,.1);color:var(--c6)">礼</div>人情</div>
+        <div class="citem"><div class="ci" style="background:rgba(108,138,228,.1);color:var(--c1)">学</div>学习</div>
+        <div class="citem"><div class="ci" style="background:rgba(108,138,228,.1);color:var(--c1)">⋯</div>其他</div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="keypad">
+        <div class="krow"><div class="key">1</div><div class="key">2</div><div class="key">3</div></div>
+        <div class="krow"><div class="key">4</div><div class="key">5</div><div class="key">6</div></div>
+        <div class="krow"><div class="key">7</div><div class="key">8</div><div class="key">9</div></div>
+        <div class="krow"><div class="key">.</div><div class="key">0</div><div class="key del">⌫</div></div>
+      </div>
+      <div class="savebar">
+        <div class="savebtn">保存</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="caption">② 记一笔 · 输金额 → 点分类 → 保存</div>
+</div>
+
+<!-- ============ 3. 统计页 ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar"><span>9:43</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="screen">
+    <div class="scroll">
+      <div class="pagehead">
+        <h1>统计</h1>
+        <div class="monthnav"><span class="chev">‹</span>2026年9月<span class="chev" style="opacity:.3">›</span></div>
+      </div>
+      <div class="sumrow">
+        <div class="sumcard"><div class="k">↑ 支出</div><div class="v" style="color:var(--expense)">4,140</div></div>
+        <div class="sumcard"><div class="k">↓ 收入</div><div class="v" style="color:var(--income)">8,000</div></div>
+        <div class="sumcard"><div class="k">◫ 结余</div><div class="v" style="color:var(--primary)">3,860</div></div>
+      </div>
+
+      <div class="sec">
+        <h3>支出构成</h3>
+        <div class="sub">共 ¥4,140</div>
+        <div class="donutwrap">
+          <svg width="150" height="150" viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EDEFF3" stroke-width="6"/>
+            <!-- 餐饮 34% -->
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#E8686B" stroke-width="6"
+              stroke-dasharray="34 66" stroke-dashoffset="25" transform="rotate(0 21 21)"/>
+            <!-- 居住 24% -->
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#00B894" stroke-width="6"
+              stroke-dasharray="24 76" stroke-dashoffset="-9"/>
+            <!-- 购物 18% -->
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#F5A623" stroke-width="6"
+              stroke-dasharray="18 82" stroke-dashoffset="-33"/>
+            <!-- 交通 13% -->
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#6C8AE4" stroke-width="6"
+              stroke-dasharray="13 87" stroke-dashoffset="-51"/>
+            <!-- 娱乐 11% -->
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#9B6CE4" stroke-width="6"
+              stroke-dasharray="11 89" stroke-dashoffset="-64"/>
+          </svg>
+          <div class="legend">
+            <div class="li"><span class="sq" style="background:#E8686B"></span>餐饮<span class="pct">34%</span></div>
+            <div class="li"><span class="sq" style="background:#00B894"></span>居住<span class="pct">24%</span></div>
+            <div class="li"><span class="sq" style="background:#F5A623"></span>购物<span class="pct">18%</span></div>
+            <div class="li"><span class="sq" style="background:#6C8AE4"></span>交通<span class="pct">13%</span></div>
+            <div class="li"><span class="sq" style="background:#9B6CE4"></span>娱乐<span class="pct">11%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>分类排行</h3>
+        <div style="margin-top:12px">
+          <div class="rank">
+            <div class="rt"><span style="color:var(--c3)">餐</span>餐饮<span class="val">¥1,410</span></div>
+            <div class="bar"><i style="width:100%;background:rgba(232,104,107,.85)"></i></div>
+          </div>
+          <div class="rank">
+            <div class="rt"><span style="color:var(--c0)">住</span>居住<span class="val">¥1,000</span></div>
+            <div class="bar"><i style="width:71%;background:rgba(0,184,148,.85)"></i></div>
+          </div>
+          <div class="rank">
+            <div class="rt"><span style="color:var(--c2)">购</span>购物<span class="val">¥745</span></div>
+            <div class="bar"><i style="width:53%;background:rgba(245,166,35,.85)"></i></div>
+          </div>
+          <div class="rank">
+            <div class="rt"><span style="color:var(--c1)">交</span>交通<span class="val">¥538</span></div>
+            <div class="bar"><i style="width:38%;background:rgba(108,138,228,.85)"></i></div>
+          </div>
+          <div class="rank" style="margin-bottom:0">
+            <div class="rt"><span style="color:var(--c4)">娱</span>娱乐<span class="val">¥447</span></div>
+            <div class="bar"><i style="width:32%;background:rgba(155,108,228,.85)"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>近 6 个月支出</h3>
+        <div class="bars">
+          <div class="gridlines"><i></i><i></i><i></i><i></i></div>
+          <div class="barcol"><div class="b" style="height:52%;background:rgba(0,184,148,.32)"></div><span class="l">4月</span></div>
+          <div class="barcol"><div class="b" style="height:68%;background:rgba(0,184,148,.32)"></div><span class="l">5月</span></div>
+          <div class="barcol"><div class="b" style="height:44%;background:rgba(0,184,148,.32)"></div><span class="l">6月</span></div>
+          <div class="barcol"><div class="b" style="height:81%;background:rgba(0,184,148,.32)"></div><span class="l">7月</span></div>
+          <div class="barcol"><div class="b" style="height:63%;background:rgba(0,184,148,.32)"></div><span class="l">8月</span></div>
+          <div class="barcol"><div class="b" style="height:74%;background:var(--primary)"></div><span class="l" style="color:var(--primary);font-weight:700">9月</span></div>
+        </div>
+      </div>
+      <div style="height:100px"></div>
+
+      <div class="tabbar">
+        <div class="notch"></div>
+        <div class="fab">+</div>
+        <div class="tab"><span class="ti">▤</span>账单</div>
+        <div class="tab on"><span class="ti">◑</span>统计</div>
+        <div class="fabspace"></div>
+        <div class="tab"><span class="ti">▱</span>预算</div>
+        <div class="tab"><span class="ti">◔</span>我的</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="caption">③ 统计页 · 环形图 + 排行 + 6月趋势</div>
+</div>
+
+<!-- ============ 4. 预算页 ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar"><span>9:44</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="screen">
+    <div class="scroll">
+      <div class="pagehead">
+        <h1>预算</h1>
+        <div class="monthnav"><span class="chev">‹</span>2026年9月<span class="chev" style="opacity:.3">›</span></div>
+      </div>
+
+      <div class="bigcard" style="background:linear-gradient(135deg,#F5A623,#F5A623)">
+        <div class="row">
+          <span class="k">本月总预算</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.6);margin-left:4px">✎</span>
+          <span class="spacer"></span>
+          <span class="badge">接近上限</span>
+        </div>
+        <div class="amt">¥7,000</div>
+        <div class="ovtrack"><i style="width:81%"></i></div>
+        <div class="ovstats">
+          <div><div class="k">已支出</div><div class="v">5,640</div></div>
+          <div><div class="k">剩余</div><div class="v">1,360</div></div>
+          <div><div class="k">进度</div><div class="v">81%</div></div>
+        </div>
+        <div class="todaybox">
+          <span>▣</span><span class="k">今天还可花</span>
+          <span class="v">¥113</span><span class="s">已花 92</span>
+        </div>
+      </div>
+
+      <div class="secttl" style="display:flex;align-items:flex-end">
+        <span>分类预算</span>
+        <span style="font-size:11px;font-weight:400;color:var(--text-sub);margin-left:8px">已分配 3,200 / 7,000</span>
+      </div>
+
+      <div class="btile">
+        <div class="tr">
+          <div class="ci" style="background:rgba(232,104,107,.12);color:var(--c3)">餐</div>
+          <div class="nm">餐饮</div>
+          <div class="num">1,410</div><div class="den">/ 2,000</div>
+          <div style="color:var(--text-sub)">›</div>
+        </div>
+        <div class="track"><i style="width:70%;background:var(--primary)"></i></div>
+        <div class="ft" style="color:var(--primary)">✓ 还剩 ¥590<span class="p">70%</span></div>
+      </div>
+
+      <div class="btile">
+        <div class="tr">
+          <div class="ci" style="background:rgba(245,166,35,.12);color:var(--c2)">购</div>
+          <div class="nm">购物</div>
+          <div class="num">745</div><div class="den">/ 800</div>
+          <div style="color:var(--text-sub)">›</div>
+        </div>
+        <div class="track"><i style="width:93%;background:var(--warn)"></i></div>
+        <div class="ft" style="color:var(--warn)">⚠ 还剩 ¥55<span class="p">93%</span></div>
+      </div>
+
+      <div class="btile over">
+        <div class="tr">
+          <div class="ci" style="background:rgba(155,108,228,.12);color:var(--c4)">娱</div>
+          <div class="nm">娱乐</div>
+          <div class="num" style="color:var(--danger)">447</div><div class="den">/ 400</div>
+          <div style="color:var(--text-sub)">›</div>
+        </div>
+        <div class="track"><i style="width:100%;background:var(--danger)"></i></div>
+        <div class="ft" style="color:var(--danger)">⚠ 超支 ¥47<span class="p">112%</span></div>
+      </div>
+
+      <div style="margin:4px 16px 8px;height:46px;border:1px solid var(--divider);border-radius:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--primary)">
+        <span style="font-size:16px">+</span> 添加分类预算
+      </div>
+
+      <div class="tip">
+        <div class="h">◐ 怎么用</div>
+        <div class="b">总预算管整体，分类预算管细节，两者独立。<br>分类预算只用给你真正想管的分类设 —— 比如「餐饮」容易超，「居住」是固定支出就不用管。<br>预设的额度下个月会自动沿用。</div>
+      </div>
+      <div style="height:100px"></div>
+
+      <div class="tabbar">
+        <div class="notch"></div>
+        <div class="fab">+</div>
+        <div class="tab"><span class="ti">▤</span>账单</div>
+        <div class="tab"><span class="ti">◑</span>统计</div>
+        <div class="fabspace"></div>
+        <div class="tab on"><span class="ti">▱</span>预算</div>
+        <div class="tab"><span class="ti">◔</span>我的</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="caption">④ 预算页 · 总预算可编辑 + 分类按需添加</div>
+</div>
+
+<!-- ============ 4.5 预算页空状态 ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar"><span>9:44</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="screen">
+    <div class="scroll">
+      <div class="pagehead">
+        <h1>预算</h1>
+        <div class="monthnav"><span class="chev">‹</span>2026年9月<span class="chev" style="opacity:.3">›</span></div>
+      </div>
+
+      <div class="bigcard" style="background:linear-gradient(135deg,#8A93A5,#8A93A5)">
+        <div class="row"><span class="k">本月总预算</span></div>
+        <div class="amt" style="font-size:24px;color:rgba(255,255,255,.85)">点击设置</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:16px">设一个本月能花的总额，打开 App 就知道还剩多少</div>
+      </div>
+
+      <div class="secttl">分类预算</div>
+
+      <div style="margin:0 16px;background:#fff;border-radius:14px;padding:26px 20px;text-align:center">
+        <div style="font-size:34px;color:var(--text-sub);margin-bottom:10px">◍</div>
+        <div style="font-size:13.5px;font-weight:600">还没有分类预算</div>
+        <div style="font-size:11.5px;color:var(--text-sub);margin-top:6px;line-height:1.6">
+          给容易超支的分类单独设个额度<br>比如「餐饮 2000」「购物 800」
+        </div>
+        <div style="margin:16px auto 0;height:42px;width:170px;border-radius:11px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13.5px;font-weight:600">
+          <span style="font-size:16px">+</span> 添加分类预算
+        </div>
+      </div>
+
+      <div class="tip">
+        <div class="h">◐ 怎么用</div>
+        <div class="b">总预算管整体，分类预算管细节，两者独立。<br>分类预算只用给你真正想管的分类设 —— 比如「餐饮」容易超，「居住」是固定支出就不用管。<br>预设的额度下个月会自动沿用。</div>
+      </div>
+      <div style="height:100px"></div>
+
+      <div class="tabbar">
+        <div class="notch"></div>
+        <div class="fab">+</div>
+        <div class="tab"><span class="ti">▤</span>账单</div>
+        <div class="tab"><span class="ti">◑</span>统计</div>
+        <div class="fabspace"></div>
+        <div class="tab on"><span class="ti">▱</span>预算</div>
+        <div class="tab"><span class="ti">◔</span>我的</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="caption">④.⑤ 预算页空状态 · 什么都没设时的引导</div>
+</div>
+
+<!-- ============ 5. 我的页 ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar"><span>9:45</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="screen">
+    <div class="scroll">
+      <div class="pagehead"><h1>我的</h1></div>
+
+      <div class="profile">
+        <div style="font-size:24px">🧾</div>
+        <div>
+          <div class="k">累计记录</div>
+          <div class="n">128 笔</div>
+        </div>
+        <div class="r">
+          <div class="s">数据仅存本机</div>
+          <div class="s2">不上传、无广告</div>
+        </div>
+      </div>
+
+      <div class="secttl" style="color:var(--text-sub);font-size:13px;margin-top:0">数据</div>
+      <div class="menu">
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">⇩</div>
+          <div class="mm"><div class="mt">导出 CSV</div><div class="ms">Excel 可直接打开，永久免费</div></div>
+          <div class="mc">›</div>
+        </div>
+        <div class="mline"></div>
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">⇧</div>
+          <div class="mm"><div class="mt">导出 JSON 备份</div><div class="ms">完整数据，可留档</div></div>
+          <div class="mc">›</div>
+        </div>
+      </div>
+
+      <div class="secttl" style="color:var(--text-sub);font-size:13px">分类</div>
+      <div class="menu">
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">▤</div>
+          <div class="mm"><div class="mt">管理分类</div><div class="ms">增删分类、改名、换图标</div></div>
+          <div class="mc">›</div>
+        </div>
+      </div>
+
+      <div class="secttl" style="color:var(--text-sub);font-size:13px">自动化</div>
+      <div class="menu">
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">◎</div>
+          <div class="mm"><div class="mt">支付自动记账</div><div class="ms">支付宝/微信付款时弹窗确认</div></div>
+          <div class="mc">›</div>
+        </div>
+      </div>
+
+      <div class="secttl" style="color:var(--text-sub);font-size:13px">关于</div>
+      <div class="menu">
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">i</div>
+          <div class="mm"><div class="mt">版本</div><div class="ms">v1.1.0 · 纯本地离线版</div></div>
+        </div>
+        <div class="mline"></div>
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">‹›</div>
+          <div class="mm"><div class="mt">技术</div><div class="ms">Flutter + SQLite</div></div>
+        </div>
+        <div class="mline"></div>
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">◈</div>
+          <div class="mm"><div class="mt">隐私</div><div class="ms">无网络权限，数据不出手机</div></div>
+        </div>
+      </div>
+
+      <div class="secttl" style="color:var(--text-sub);font-size:13px">危险操作</div>
+      <div class="menu">
+        <div class="mitem">
+          <div class="mi" style="background:rgba(232,76,61,.1);color:var(--danger)">⌫</div>
+          <div class="mm"><div class="mt" style="color:var(--danger)">清空所有数据</div><div class="ms">删除全部账单和预算</div></div>
+        </div>
+      </div>
+
+      <div class="foot-note">你的数据，永远归你。</div>
+      <div style="height:100px"></div>
+
+      <div class="tabbar">
+        <div class="notch"></div>
+        <div class="fab">+</div>
+        <div class="tab"><span class="ti">▤</span>账单</div>
+        <div class="tab"><span class="ti">◑</span>统计</div>
+        <div class="fabspace"></div>
+        <div class="tab"><span class="ti">▱</span>预算</div>
+        <div class="tab on"><span class="ti">◔</span>我的</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="caption">⑤ 我的 · 数据导出与管理</div>
+</div>
+
+<!-- ============ 6. 支付确认弹窗（v1.1.0 新增） ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar"><span>14:32</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="screen">
+    <!-- 背景：账单页，被遮罩压暗 -->
+    <div class="scroll">
+      <div class="mhead"><span class="chev">‹</span><span class="t">2026年9月</span><span class="chev">›</span></div>
+      <div class="overview">
+        <div class="lbl">本月结余</div>
+        <div class="big">¥ 2,847.50</div>
+        <div class="ministats">
+          <div class="ministat"><div class="k">收入</div><div class="v" style="color:var(--income)">¥8,000</div></div>
+          <div class="vline"></div>
+          <div class="ministat"><div class="k">支出</div><div class="v" style="color:var(--expense)">¥5,152</div></div>
+        </div>
+      </div>
+      <div class="budbar">
+        <div class="top"><span>本月预算</span><span class="r" style="color:var(--primary)">已用 64%</span></div>
+        <div class="track"><i style="width:64%;background:var(--primary)"></i></div>
+        <div class="foot">还剩 ¥2,848 / 共 ¥8,000</div>
+      </div>
+    </div>
+    <div class="dim"></div>
+
+    <!-- 弹窗本体 -->
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="hd">
+        <div class="ic">◎</div>
+        <div class="t">检测到一笔支出</div>
+        <div class="tag">刚收到</div>
+      </div>
+      <div class="amt">
+        <span class="cur" style="color:var(--c3)">¥</span>
+        <span class="num" style="color:var(--c3)">28.50</span>
+      </div>
+      <div class="fields">
+        <div class="frow">
+          <span class="fl">分类</span>
+          <span class="fv">餐饮</span>
+          <span class="fc">›</span>
+        </div>
+        <div class="frow">
+          <span class="fl">备注</span>
+          <span class="fv" style="color:var(--text-sub);font-size:12.5px">支付成功 ¥28.50</span>
+          <span class="fc">›</span>
+        </div>
+        <div class="frow" style="border-bottom:none">
+          <span class="fl">来源</span>
+          <span class="fv"><span class="src">支付宝</span></span>
+        </div>
+      </div>
+      <div class="sheetbtns">
+        <div class="sbtn ghost">忽略</div>
+        <div class="sbtn prim">保存</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="caption">⑥ 支付确认弹窗 · 金额分类已预填，你只需点一下</div>
+</div>
+
+<!-- ============ 6.5 横幅提醒（降级方案） ============ -->
+<div class="cap-wrap">
+<div class="phone" style="background:#2A2E38">
+  <div class="statusbar" style="color:#fff"><span>14:32</span><span class="dots" style="color:#fff"><i style="background:#fff"></i><i style="background:#fff"></i><i style="background:#fff"></i></span></div>
+  <div class="screen" style="padding:8px 10px">
+    <!-- heads-up 横幅 -->
+    <div style="background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center">
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex:0 0 36px">记</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700">记账 · 支付宝</div>
+        <div style="font-size:11.5px;color:var(--text-sub);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">支付成功 ¥28.50 · 点击确认记账</div>
+      </div>
+      <div style="font-size:10px;color:var(--text-sub)">现在</div>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:10px;color:rgba(255,255,255,.55)">↑ 付款瞬间从屏幕顶部弹出，点一下直达确认框</div>
+  </div>
+</div>
+<div class="caption">⑥.⑤ 横幅提醒 · 没开悬浮窗权限时的降级方案</div>
+</div>
+
+<!-- ============ 7. 支付感应设置页（v1.1.0 新增） ============ -->
+<div class="cap-wrap">
+<div class="phone">
+  <div class="statusbar"><span>14:33</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="screen">
+    <div class="scroll">
+      <div class="pagehead"><span class="chev">‹</span><h1>支付自动记账</h1></div>
+
+      <div class="switchrow">
+        <div>
+          <div class="st">开启感应</div>
+          <div class="sb">付款后弹窗提醒，确认才记账</div>
+        </div>
+        <div class="sw"><i></i></div>
+      </div>
+
+      <div class="secttl">弹出方式</div>
+      <div class="menu">
+        <div class="mitem">
+          <div class="mi" style="background:rgba(0,184,148,.1);color:var(--primary)">⚡</div>
+          <div class="mm">
+            <div class="mt">付款后立即弹出</div>
+            <div class="ms">确认框直接弹到屏幕上，不用你找 App</div>
+          </div>
+          <div style="font-size:11px;font-weight:600;color:var(--primary)">已开启</div>
+        </div>
+        <div class="mline"></div>
+        <div class="mitem">
+          <div class="mi" style="background:rgba(245,166,35,.12);color:var(--warn)">▲</div>
+          <div class="mm">
+            <div class="mt">横幅提醒（降级方案）</div>
+            <div class="ms">没开悬浮窗权限时：顶部弹横幅，点一下进入确认</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta" style="display:none">去系统设置开启「通知使用权」</div>
+      <div class="hint">悬浮窗权限 → 付款瞬间确认框直接弹出；没有它则降级为顶部横幅</div>
+
+      <div class="secttl">它是怎么工作的</div>
+
+      <div class="stepcard">
+        <div class="sn">1</div>
+        <div>
+          <div class="st">只认支付宝和微信</div>
+          <div class="sb">其他 App 的通知一律不读取，包名白名单硬编码。</div>
+        </div>
+      </div>
+      <div class="stepcard">
+        <div class="sn">2</div>
+        <div>
+          <div class="st">从通知里提取金额和方向</div>
+          <div class="sb">「支付成功 ¥28.50」→ 支出 28.5 元。识别不了就保留原文，交给你判断。</div>
+        </div>
+      </div>
+      <div class="stepcard">
+        <div class="sn">3</div>
+        <div>
+          <div class="st">自动猜一个分类</div>
+          <div class="sb">美团→餐饮、滴滴→交通、淘宝→购物。猜错了在弹窗里改一下即可。</div>
+        </div>
+      </div>
+      <div class="stepcard">
+        <div class="sn">4</div>
+        <div>
+          <div class="st">弹窗等你确认</div>
+          <div class="sb">不会偷偷记账。点「保存」才写入，点「忽略」就丢弃。</div>
+        </div>
+      </div>
+
+      <div class="secttl">常见问题</div>
+      <div class="faq">
+        <div class="q">付款后多久会弹出提示？</div>
+        <div class="a">开启悬浮窗权限后：付款或到账的瞬间，确认框直接弹到屏幕上。没开则顶部弹横幅，点一下进入确认。两条路都走不通时，通知会暂存，下次打开 App 自动补弹。</div>
+        <div class="mline" style="margin-left:16px"></div>
+        <div class="q">小米/红米开了悬浮窗权限还是不弹？</div>
+        <div class="a">MIUI 把「后台弹出界面」做成了独立权限：设置 → 应用管理 → 记账 → 权限管理 → 打开「后台弹出界面」，并允许「自启动」。</div>
+        <div class="mline" style="margin-left:16px"></div>
+        <div class="q">会读取我的聊天内容吗？</div>
+        <div class="a">不会。只读取支付宝和微信推送到通知栏的标题和正文，也就是你在锁屏上能直接看到的那部分文字。不读取聊天记录，也不联网。</div>
+        <div class="mline" style="margin-left:16px"></div>
+        <div class="q">识别错了怎么办？</div>
+        <div class="a">弹窗里可以改金额、改分类、改备注，也可以直接点「忽略」。识别不准的通知会显示原文，让你自己判断。</div>
+        <div class="mline" style="margin-left:16px"></div>
+        <div class="q">怎么彻底关掉？</div>
+        <div class="a">关掉上面的「开启感应」开关，或去系统设置里关闭「通知使用权」。关掉后 App 完全收不到任何通知。</div>
+      </div>
+
+      <div style="height:30px"></div>
+    </div>
+  </div>
+</div>
+<div class="caption">⑦ 支付感应设置 · 权限引导与原理说明</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+name: record_ledger
+description: 极简预算记账 - 无广告、离线、数据归自己
+publish_to: 'none'
+version: 1.2.0+6
+
+environment:
+  sdk: ">=2.17.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.0.0
+  path: 1.8.1
+  path_provider: ^2.0.0
+  intl: ^0.17.0
+  fl_chart: ^0.55.0
+  share_plus: ^6.3.0
+  shared_preferences: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
