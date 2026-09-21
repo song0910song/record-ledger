@@ -426,20 +426,4 @@ flutter build apk --release --no-tree-shake-icons
 
 ---
 
-## 十、发布前校验清单
-
-每次打包后都会跑这七项：
-
-| 检查项 | 说明 |
-|---|---|
-| 压缩包完整性 | `unzip -t` 无错误 |
-| **入口类在 dex 中** | **v1.0.0 闪退的教训，必查** |
-| APK 签名 | CERT.RSA / CERT.SF / MANIFEST.MF 齐全 |
-| 三架构 native 库 | arm64-v8a / armeabi-v7a / x86_64 |
-| 图标字体完整 | 1,614,500 字节（未裁剪） |
-| 无 INTERNET 权限 | 兑现"数据不出手机"的承诺 |
-| 单元测试 | `flutter test` 全绿 |
-
----
-
 *你的数据，永远归你。*
