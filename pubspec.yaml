@@ -10,12 +10,14 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: ^2.0.0
-  path: 1.8.1
+  path: ^1.9.1
   path_provider: ^2.0.0
   intl: ^0.17.0
-  fl_chart: ^0.55.0
+  fl_chart: ^1.2.0
   share_plus: ^6.3.0
   shared_preferences: ^2.0.0
+  sqflite_common_ffi_web: ^1.2.0
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:

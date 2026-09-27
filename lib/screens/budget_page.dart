@@ -193,11 +193,13 @@ class BudgetPageState extends State<BudgetPage> {
             borderRadius: BorderRadius.circular(20),
             child: const Padding(
               padding: EdgeInsets.all(4),
-              child: Icon(Icons.chevron_left, size: 20, color: AppColors.textSub),
+              child:
+                  Icon(Icons.chevron_left, size: 20, color: AppColors.textSub),
             ),
           ),
           Text('${_month.year}年${_month.month}月',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           InkWell(
             onTap: _isCurrentMonth ? null : () => _shift(1),
             borderRadius: BorderRadius.circular(20),
@@ -205,7 +207,8 @@ class BudgetPageState extends State<BudgetPage> {
               padding: const EdgeInsets.all(4),
               child: Icon(Icons.chevron_right,
                   size: 20,
-                  color: _isCurrentMonth ? AppColors.divider : AppColors.textSub),
+                  color:
+                      _isCurrentMonth ? AppColors.divider : AppColors.textSub),
             ),
           ),
         ],
@@ -249,8 +252,8 @@ class BudgetPageState extends State<BudgetPage> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: hasBudget
-                ? [color.withOpacity(0.9), color.withOpacity(0.68)]
-                : [AppColors.textSub, AppColors.textSub.withOpacity(0.75)],
+                ? [color.withValues(alpha: 0.9), color.withValues(alpha: 0.68)]
+                : [AppColors.textSub, AppColors.textSub.withValues(alpha: 0.75)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -273,7 +276,7 @@ class BudgetPageState extends State<BudgetPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.22),
+                      color: Colors.white.withValues(alpha: 0.22),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -307,7 +310,8 @@ class BudgetPageState extends State<BudgetPage> {
             if (isInherited) ...[
               const SizedBox(height: 4),
               Text('沿用自 ${_prettyMonth(_totalBudgetFrom!)}',
-                  style: const TextStyle(fontSize: 10.5, color: Colors.white60)),
+                  style:
+                      const TextStyle(fontSize: 10.5, color: Colors.white60)),
             ],
             const SizedBox(height: 14),
             if (hasBudget) ...[
@@ -338,7 +342,7 @@ class BudgetPageState extends State<BudgetPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.16),
+                    color: Colors.white.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -346,7 +350,8 @@ class BudgetPageState extends State<BudgetPage> {
                       const Icon(Icons.today, size: 15, color: Colors.white),
                       const SizedBox(width: 8),
                       const Text('今天还可花',
-                          style: TextStyle(fontSize: 12, color: Colors.white70)),
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.white70)),
                       const Spacer(),
                       Text(fmtMoney(_todayRemain),
                           style: const TextStyle(
@@ -386,7 +391,9 @@ class BudgetPageState extends State<BudgetPage> {
           const SizedBox(height: 2),
           Text(v,
               style: const TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white)),
         ],
       ),
     );
@@ -454,12 +461,12 @@ class BudgetPageState extends State<BudgetPage> {
               icon: const Icon(Icons.add, size: 17),
               label: const Text('添加分类预算'),
               style: ElevatedButton.styleFrom(
-                primary: AppColors.primary,
+                backgroundColor: AppColors.primary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(11)),
-                textStyle:
-                    const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+                textStyle: const TextStyle(
+                    fontSize: 13.5, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -477,18 +484,21 @@ class BudgetPageState extends State<BudgetPage> {
         icon: const Icon(Icons.add, size: 17),
         label: Text(left == 0 ? '所有分类都已设置额度' : '添加分类预算'),
         style: OutlinedButton.styleFrom(
-          primary: AppColors.primary,
+          foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.divider),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
-          textStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+          textStyle:
+              const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
         ),
       ),
     );
   }
 
   Widget _budgetTile(BudgetView v) {
-    final color =
-        v.over ? AppColors.danger : (v.near ? AppColors.warn : AppColors.primary);
+    final color = v.over
+        ? AppColors.danger
+        : (v.near ? AppColors.warn : AppColors.primary);
     final ratio = v.ratio.clamp(0.0, 1.0);
 
     return GestureDetector(
@@ -500,7 +510,7 @@ class BudgetPageState extends State<BudgetPage> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: v.over
-              ? Border.all(color: AppColors.danger.withOpacity(0.35), width: 1)
+              ? Border.all(color: AppColors.danger.withValues(alpha: 0.35), width: 1)
               : null,
         ),
         child: Column(
@@ -511,10 +521,11 @@ class BudgetPageState extends State<BudgetPage> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: v.category.color.withOpacity(0.12),
+                    color: v.category.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(v.category.icon, size: 17, color: v.category.color),
+                  child:
+                      Icon(v.category.icon, size: 17, color: v.category.color),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -588,8 +599,8 @@ class BudgetPageState extends State<BudgetPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(ctx).size.height * 0.7),
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.7),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -606,20 +617,20 @@ class BudgetPageState extends State<BudgetPage> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 4),
               child: Row(
-                children: const [
+                children: [
                   Text('选择要设额度的分类',
-                      style: TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w700)),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                   Spacer(),
                   Text('设过的不会再出现',
-                      style:
-                          TextStyle(fontSize: 11, color: AppColors.textSub)),
+                      style: TextStyle(fontSize: 11, color: AppColors.textSub)),
                 ],
               ),
-            ),            Flexible(
+            ),
+            Flexible(
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
@@ -632,7 +643,7 @@ class BudgetPageState extends State<BudgetPage> {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: v.category.color.withOpacity(0.12),
+                        color: v.category.color.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(v.category.icon,
@@ -752,8 +763,8 @@ class BudgetPageState extends State<BudgetPage> {
               ),
               const SizedBox(height: 4),
               Text(subtitle,
-                  style: const TextStyle(
-                      fontSize: 12, color: AppColors.textSub)),
+                  style:
+                      const TextStyle(fontSize: 12, color: AppColors.textSub)),
               const SizedBox(height: 16),
               TextField(
                 controller: controller,
@@ -776,14 +787,14 @@ class BudgetPageState extends State<BudgetPage> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
               const SizedBox(height: 8),
               Text(helper,
-                  style: const TextStyle(
-                      fontSize: 11, color: AppColors.textSub)),
+                  style:
+                      const TextStyle(fontSize: 11, color: AppColors.textSub)),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -811,7 +822,7 @@ class BudgetPageState extends State<BudgetPage> {
                       child: ElevatedButton(
                         onPressed: () => Navigator.pop(ctx, true),
                         style: ElevatedButton.styleFrom(
-                          primary: AppColors.primary,
+                          backgroundColor: AppColors.primary,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
@@ -840,22 +851,23 @@ class BudgetPageState extends State<BudgetPage> {
         color: AppColors.primaryLight,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.lightbulb_outline, size: 15, color: AppColors.primary),
-          const SizedBox(width: 8),
+          Icon(Icons.lightbulb_outline,
+              size: 15, color: AppColors.primary),
+          SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('怎么用',
+                Text('怎么用',
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary)),
-                const SizedBox(height: 4),
-                const Text(
+                SizedBox(height: 4),
+                Text(
                   '总预算管整体，分类预算管细节，两者独立。\n'
                   '分类预算只用给你真正想管的分类设 —— 比如「餐饮」容易超，「居住」是固定支出就不用管。\n'
                   '预设的额度下个月会自动沿用，不用重复设置。',

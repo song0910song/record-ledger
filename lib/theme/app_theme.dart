@@ -23,9 +23,14 @@ class AppColors {
 
   /// 分类配色盘
   static const List<Color> palette = [
-    Color(0xFF00B894), Color(0xFF6C8AE4), Color(0xFFF5A623),
-    Color(0xFFE8686B), Color(0xFF9B6CE4), Color(0xFF4BC0C0),
-    Color(0xFFE48A6C), Color(0xFF5BA8E4),
+    Color(0xFF00B894),
+    Color(0xFF6C8AE4),
+    Color(0xFFF5A623),
+    Color(0xFFE8686B),
+    Color(0xFF9B6CE4),
+    Color(0xFF4BC0C0),
+    Color(0xFFE48A6C),
+    Color(0xFF5BA8E4),
   ];
 }
 
@@ -50,7 +55,7 @@ class AppTheme {
           fontWeight: FontWeight.w700,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.card,
         elevation: 0,
         margin: EdgeInsets.zero,

@@ -111,7 +111,9 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                         child: Text(
                           '提示：删除分类不会删除已有账单，那些账单会显示为「未分类」。',
                           style: TextStyle(
-                              fontSize: 11, color: AppColors.textSub, height: 1.5),
+                              fontSize: 11,
+                              color: AppColors.textSub,
+                              height: 1.5),
                         ),
                       ),
                     ],
@@ -155,7 +157,7 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: c.color.withOpacity(0.12),
+                color: c.color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(9),
               ),
               child: Icon(c.icon, size: 16, color: c.color),
@@ -181,15 +183,39 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
   }
 
   static const List<IconData> _icons = [
-    Icons.restaurant, Icons.local_cafe, Icons.shopping_bag, Icons.directions_bus,
-    Icons.local_taxi, Icons.home, Icons.bolt, Icons.water_drop,
-    Icons.sports_esports, Icons.movie, Icons.music_note, Icons.fitness_center,
-    Icons.local_hospital, Icons.medication, Icons.smartphone, Icons.wifi,
-    Icons.card_giftcard, Icons.menu_book, Icons.school, Icons.pets,
-    Icons.child_care, Icons.flight, Icons.hotel, Icons.local_gas_station,
-    Icons.account_balance_wallet, Icons.emoji_events, Icons.work_outline,
-    Icons.trending_up, Icons.redeem, Icons.receipt_long, Icons.more_horiz,
-    Icons.savings, Icons.attach_money,
+    Icons.restaurant,
+    Icons.local_cafe,
+    Icons.shopping_bag,
+    Icons.directions_bus,
+    Icons.local_taxi,
+    Icons.home,
+    Icons.bolt,
+    Icons.water_drop,
+    Icons.sports_esports,
+    Icons.movie,
+    Icons.music_note,
+    Icons.fitness_center,
+    Icons.local_hospital,
+    Icons.medication,
+    Icons.smartphone,
+    Icons.wifi,
+    Icons.card_giftcard,
+    Icons.menu_book,
+    Icons.school,
+    Icons.pets,
+    Icons.child_care,
+    Icons.flight,
+    Icons.hotel,
+    Icons.local_gas_station,
+    Icons.account_balance_wallet,
+    Icons.emoji_events,
+    Icons.work_outline,
+    Icons.trending_up,
+    Icons.redeem,
+    Icons.receipt_long,
+    Icons.more_horiz,
+    Icons.savings,
+    Icons.attach_money,
   ];
 
   Future<void> _edit(Category? c) async {
@@ -203,7 +229,8 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setS) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: Container(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
             decoration: const BoxDecoration(
@@ -257,16 +284,18 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                         child: Container(
                           decoration: BoxDecoration(
                             color: on
-                                ? Color(colorValue).withOpacity(0.15)
+                                ? Color(colorValue).withValues(alpha: 0.15)
                                 : AppColors.bg,
                             borderRadius: BorderRadius.circular(8),
                             border: on
-                                ? Border.all(color: Color(colorValue), width: 1.5)
+                                ? Border.all(
+                                    color: Color(colorValue), width: 1.5)
                                 : null,
                           ),
                           child: Icon(_icons[i],
                               size: 17,
-                              color: on ? Color(colorValue) : AppColors.textSub),
+                              color:
+                                  on ? Color(colorValue) : AppColors.textSub),
                         ),
                       );
                     },
@@ -293,7 +322,8 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                               : null,
                         ),
                         child: on
-                            ? const Icon(Icons.check, size: 15, color: Colors.white)
+                            ? const Icon(Icons.check,
+                                size: 15, color: Colors.white)
                             : null,
                       ),
                     );
@@ -328,7 +358,7 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                       Navigator.pop(ctx);
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: AppColors.primary,
+                      backgroundColor: AppColors.primary,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
@@ -361,8 +391,8 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('删除「${c.name}」？', style: const TextStyle(fontSize: 16)),
-        content: const Text('已有账单不会删除，会显示为「未分类」。',
-            style: TextStyle(fontSize: 13)),
+        content:
+            const Text('已有账单不会删除，会显示为「未分类」。', style: TextStyle(fontSize: 13)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),

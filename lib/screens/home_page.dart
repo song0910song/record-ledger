@@ -349,7 +349,7 @@ class HomePageState extends State<HomePage> {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: cat.color.withOpacity(0.12),
+                color: cat.color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(cat.icon, size: 18, color: cat.color),
@@ -399,7 +399,7 @@ class HomePageState extends State<HomePage> {
       child: Column(
         children: [
           Icon(Icons.receipt_long_outlined,
-              size: 56, color: AppColors.textSub.withOpacity(0.4)),
+              size: 56, color: AppColors.textSub.withValues(alpha: 0.4)),
           const SizedBox(height: 12),
           const Text('这个月还没有记录',
               style: TextStyle(fontSize: 14, color: AppColors.textSub)),

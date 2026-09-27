@@ -221,7 +221,7 @@ class StatsPageState extends State<StatsPage> {
     if (rest > 0) {
       sections.add(PieChartSectionData(
         value: rest,
-        color: AppColors.textSub.withOpacity(0.35),
+        color: AppColors.textSub.withValues(alpha: 0.35),
         radius: 22,
         title: '其他',
         showTitle: rest / total * 100 >= 8,
@@ -344,7 +344,7 @@ class StatsPageState extends State<StatsPage> {
                       minHeight: 5,
                       backgroundColor: AppColors.divider,
                       valueColor: AlwaysStoppedAnimation(
-                          e.key.color.withOpacity(0.85)),
+                          e.key.color.withValues(alpha: 0.85)),
                     ),
                   ),
                 ],
@@ -439,7 +439,7 @@ class StatsPageState extends State<StatsPage> {
                             top: Radius.circular(4)),
                         color: i == _trend.length - 1
                             ? AppColors.primary
-                            : AppColors.primary.withOpacity(0.32),
+                            : AppColors.primary.withValues(alpha: 0.32),
                       ),
                     ]),
                 ],
@@ -457,7 +457,7 @@ class StatsPageState extends State<StatsPage> {
       child: Column(
         children: [
           Icon(Icons.pie_chart_outline,
-              size: 56, color: AppColors.textSub.withOpacity(0.4)),
+              size: 56, color: AppColors.textSub.withValues(alpha: 0.4)),
           const SizedBox(height: 12),
           const Text('还没有数据',
               style: TextStyle(fontSize: 14, color: AppColors.textSub)),

@@ -55,7 +55,7 @@ class TxnDetailPage extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: cat.color.withOpacity(0.12),
+                    color: cat.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(cat.icon, size: 24, color: cat.color),

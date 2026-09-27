@@ -1,11 +1,12 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/models.dart';
 import 'data_bus.dart';
+// 平台相关实现：IO(Android/桌面) 与 Web 分别给出。
+// 条件导入在编译期完成，Web 产物不会拖进 dart:io 与 path_provider。
+import 'db_platform_io.dart' if (dart.library.js_interop) 'db_platform_web.dart'
+    as platform;
 
 /// 本地数据库 —— 纯离线，数据只存本机
 class Db {
@@ -13,8 +14,9 @@ class Db {
 
   static Future<Database> get instance async {
     if (_db != null) return _db!;
-    final dir = await getApplicationDocumentsDirectory();
-    final path = p.join(dir.path, 'ledger.db');
+    // Web 上把默认工厂换成 sqlite3 WASM（IndexedDB 持久化）
+    platform.useWebDatabaseFactoryIfNeeded();
+    final path = await platform.resolveDatabasePath();
     _db = await openDatabase(
       path,
       version: 2,
@@ -85,7 +87,7 @@ class Db {
 
   /// 预置常用分类
   static Future<void> _seedCategories(Database db) async {
-    final c = AppColorsSeed.palette;
+    const c = AppColorsSeed.palette;
     final expenses = <List<dynamic>>[
       ['餐饮', Icons.restaurant.codePoint, c[3], 0],
       ['交通', Icons.directions_bus.codePoint, c[1], 1],
@@ -100,7 +102,11 @@ class Db {
     ];
     for (final e in expenses) {
       await db.insert('category', {
-        'name': e[0], 'icon': e[1], 'color': e[2], 'type': 0, 'sort': e[3],
+        'name': e[0],
+        'icon': e[1],
+        'color': e[2],
+        'type': 0,
+        'sort': e[3],
       });
     }
     final incomes = <List<dynamic>>[
@@ -114,7 +120,11 @@ class Db {
     ];
     for (final e in incomes) {
       await db.insert('category', {
-        'name': e[0], 'icon': e[1], 'color': e[2], 'type': 1, 'sort': e[3],
+        'name': e[0],
+        'icon': e[1],
+        'color': e[2],
+        'type': 1,
+        'sort': e[3],
       });
     }
   }
@@ -242,11 +252,13 @@ class Db {
   }
 
   // ---------- 预算 ----------
-  static Future<void> setBudget(int categoryId, String month, double amount) async {
+  static Future<void> setBudget(
+      int categoryId, String month, double amount) async {
     final db = await instance;
     if (amount <= 0) {
       await db.delete('budget',
-          where: 'category_id = ? AND month = ?', whereArgs: [categoryId, month]);
+          where: 'category_id = ? AND month = ?',
+          whereArgs: [categoryId, month]);
       DataBus.notify();
       return;
     }
@@ -260,7 +272,8 @@ class Db {
 
   static Future<Map<int, double>> budgetsOf(String month) async {
     final db = await instance;
-    final rows = await db.query('budget', where: 'month = ?', whereArgs: [month]);
+    final rows =
+        await db.query('budget', where: 'month = ?', whereArgs: [month]);
     final map = <int, double>{};
     for (final r in rows) {
       map[r['category_id'] as int] = (r['amount'] as num).toDouble();
@@ -332,7 +345,13 @@ class Db {
   }
 
   // ---------- 导出 ----------
-  static Future<File> exportCsv() async {
+
+  /// 导出 CSV。
+  ///
+  /// 返回平台相关的路径：
+  /// - Android/桌面：写入文档目录的绝对路径（可交给 share_plus 分享）
+  /// - Web：触发浏览器下载，返回生成的 blob URL（只用于展示，不保证可再读）
+  static Future<String> exportCsv() async {
     final list = await txns(limit: 100000);
     final buf = StringBuffer('\uFEFF日期,类型,分类,金额,备注\n');
     for (final t in list) {
@@ -340,12 +359,13 @@ class Db {
       final ds =
           '${d.year}-${_p2(d.month)}-${_p2(d.day)} ${_p2(d.hour)}:${_p2(d.minute)}';
       final note = t.note.replaceAll('"', '""');
-      buf.writeln('$ds,${t.isExpense ? "支出" : "收入"},${t.categoryName ?? ""},${t.amount},"$note"');
+      buf.writeln(
+          '$ds,${t.isExpense ? "支出" : "收入"},${t.categoryName ?? ""},${t.amount},"$note"');
     }
-    final dir = await getApplicationDocumentsDirectory();
-    final f = File(p.join(dir.path, 'ledger_export_${DateTime.now().millisecondsSinceEpoch}.csv'));
-    await f.writeAsString(buf.toString());
-    return f;
+    return platform.saveExportFile(
+      'ledger_export_${DateTime.now().millisecondsSinceEpoch}.csv',
+      buf.toString(),
+    );
   }
 
   static String _p2(int n) => n.toString().padLeft(2, '0');
@@ -357,14 +377,16 @@ class Db {
     final buf = StringBuffer('{"categories":[');
     for (int i = 0; i < cats.length; i++) {
       final c = cats[i];
-      buf.write('{"name":"${c.name}","icon":${c.iconCode},"color":${c.colorValue},"type":${c.type}}');
+      buf.write(
+          '{"name":"${c.name}","icon":${c.iconCode},"color":${c.colorValue},"type":${c.type}}');
       if (i != cats.length - 1) buf.write(',');
     }
     buf.write('],"txns":[');
     for (int i = 0; i < list.length; i++) {
       final t = list[i];
       final note = t.note.replaceAll('"', r'\"');
-      buf.write('{"amount":${t.amount},"type":${t.type},"category":"${t.categoryName ?? ""}","note":"$note","timestamp":${t.timestamp}}');
+      buf.write(
+          '{"amount":${t.amount},"type":${t.type},"category":"${t.categoryName ?? ""}","note":"$note","timestamp":${t.timestamp}}');
       if (i != list.length - 1) buf.write(',');
     }
     buf.write(']}');
@@ -389,13 +411,20 @@ class Db {
 /// 避免和 theme 循环依赖，这里冗余一份色盘
 class AppColorsSeed {
   static const List<int> palette = [
-    0xFF00B894, 0xFF6C8AE4, 0xFFF5A623, 0xFFE8686B,
-    0xFF9B6CE4, 0xFF4BC0C0, 0xFFE48A6C, 0xFF5BA8E4,
+    0xFF00B894,
+    0xFF6C8AE4,
+    0xFFF5A623,
+    0xFFE8686B,
+    0xFF9B6CE4,
+    0xFF4BC0C0,
+    0xFFE48A6C,
+    0xFF5BA8E4,
   ];
 }
 
 /// 月份工具
-String formatMonth(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}';
+String formatMonth(DateTime d) =>
+    '${d.year}-${d.month.toString().padLeft(2, '0')}';
 
 /// 返回 [起始ts, 结束ts)
 List<int> monthRange(String month) {

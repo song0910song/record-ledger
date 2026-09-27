@@ -123,7 +123,8 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
     final accent = p.type == 0 ? AppColors.expense : AppColors.income;
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -143,8 +144,8 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                     height: 34,
                     decoration: BoxDecoration(
                       color: p.source == '支付宝'
-                          ? const Color(0xFF1677FF).withOpacity(0.12)
-                          : const Color(0xFF07C160).withOpacity(0.12),
+                          ? const Color(0xFF1677FF).withValues(alpha: 0.12)
+                          : const Color(0xFF07C160).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
@@ -214,7 +215,9 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                       Text(
                         p.raw,
                         style: const TextStyle(
-                            fontSize: 12, height: 1.5, color: AppColors.textMain),
+                            fontSize: 12,
+                            height: 1.5,
+                            color: AppColors.textMain),
                       ),
                     ],
                   ),
@@ -240,7 +243,9 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                 children: [
                   Text('¥',
                       style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w700, color: accent)),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: accent)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
@@ -249,7 +254,9 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                       keyboardType:
                           const TextInputType.numberWithOptions(decimal: true),
                       style: const TextStyle(
-                          fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: -1),
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -1),
                       decoration: const InputDecoration(
                         isDense: true,
                         border: InputBorder.none,
@@ -264,8 +271,8 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                   ),
                   if (p.parsed && p.amount > 0)
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppColors.primaryLight,
                         borderRadius: BorderRadius.circular(6),
@@ -284,7 +291,8 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
               // 备注
               Row(
                 children: [
-                  const Icon(Icons.edit_note, size: 16, color: AppColors.textSub),
+                  const Icon(Icons.edit_note,
+                      size: 16, color: AppColors.textSub),
                   const SizedBox(width: 6),
                   Expanded(
                     child: TextField(
@@ -342,9 +350,8 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                                   width: 44,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: on
-                                        ? c.color
-                                        : c.color.withOpacity(0.1),
+                                    color:
+                                        on ? c.color : c.color.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(13),
                                     border: on
                                         ? Border.all(color: c.color, width: 2)
@@ -362,8 +369,9 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                                     color: on
                                         ? AppColors.textMain
                                         : AppColors.textSub,
-                                    fontWeight:
-                                        on ? FontWeight.w600 : FontWeight.normal,
+                                    fontWeight: on
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
                                   ),
                                 ),
                               ],
@@ -404,7 +412,8 @@ class _PayConfirmSheetState extends State<PayConfirmSheet> {
                       child: ElevatedButton(
                         onPressed: _saving ? null : _save,
                         style: ElevatedButton.styleFrom(
-                          primary: _category?.color ?? AppColors.primary,
+                          backgroundColor:
+                              _category?.color ?? AppColors.primary,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),

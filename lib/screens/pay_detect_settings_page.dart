@@ -91,7 +91,6 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
           _statusCard(svc),
-
           const SizedBox(height: 18),
           _sectionTitle('功能开关'),
           _card([
@@ -103,18 +102,15 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
                       if (mounted) setState(() {});
                     }
                   : null,
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
               title: const Text('检测到支付时提示我',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
               subtitle: Text(
-                svc.permissionGranted
-                    ? '关闭后不会再弹出确认框'
-                    : '需先开启通知使用权',
+                svc.permissionGranted ? '关闭后不会再弹出确认框' : '需先开启通知使用权',
                 style: const TextStyle(fontSize: 11, color: AppColors.textSub),
               ),
             ),
           ]),
-
           const SizedBox(height: 18),
           _sectionTitle('弹出方式'),
           _card([
@@ -130,9 +126,8 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
                             ? Icons.bolt
                             : Icons.notifications_active_outlined,
                         size: 18,
-                        color: svc.canOverlay
-                            ? AppColors.primary
-                            : AppColors.warn,
+                        color:
+                            svc.canOverlay ? AppColors.primary : AppColors.warn,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -149,8 +144,8 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
                     svc.canOverlay
                         ? '付款或到账的瞬间，确认框会直接弹到屏幕上，不用你找 App。'
                         : '付款后屏幕顶部会弹出一条横幅，点一下就进入确认框。\n'
-                          '想做到「不用点开 App、确认框直接弹到屏幕上」？'
-                          '开启悬浮窗权限即可。',
+                            '想做到「不用点开 App、确认框直接弹到屏幕上」？'
+                            '开启悬浮窗权限即可。',
                     style: const TextStyle(
                         fontSize: 12, color: AppColors.textSub, height: 1.6),
                   ),
@@ -164,7 +159,7 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
                         icon: const Icon(Icons.open_in_new, size: 16),
                         label: const Text('开启悬浮窗权限，付款立即弹出'),
                         style: ElevatedButton.styleFrom(
-                          primary: AppColors.primary,
+                          backgroundColor: AppColors.primary,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(11)),
@@ -188,10 +183,11 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
                       height: 40,
                       child: OutlinedButton.icon(
                         onPressed: _ensureNotify,
-                        icon: const Icon(Icons.notifications_outlined, size: 16),
+                        icon:
+                            const Icon(Icons.notifications_outlined, size: 16),
                         label: const Text('允许横幅通知权限'),
                         style: OutlinedButton.styleFrom(
-                          primary: AppColors.primary,
+                          foregroundColor: AppColors.primary,
                           side: const BorderSide(color: AppColors.primary),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(11)),
@@ -205,7 +201,6 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
               ),
             ),
           ]),
-
           const SizedBox(height: 18),
           _sectionTitle('工作原理'),
           _card([
@@ -225,9 +220,9 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
                       color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Row(
+                    child: const Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Icon(Icons.info_outline,
                             size: 14, color: AppColors.primary),
                         SizedBox(width: 6),
@@ -247,52 +242,50 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
               ),
             ),
           ]),
-
           const SizedBox(height: 18),
           _sectionTitle('常见问题'),
           _card([
             _faq(
               '付款后多久会弹出提示？',
               '开启悬浮窗权限后：付款或到账的瞬间，确认框直接弹到屏幕上。\n'
-              '没开悬浮窗权限：屏幕顶部弹一条横幅，点一下进入确认框。\n'
-              '两条路都走不通时（比如权限没给全），通知会暂存起来，'
-              '你下次打开 App 时自动补弹。',
+                  '没开悬浮窗权限：屏幕顶部弹一条横幅，点一下进入确认框。\n'
+                  '两条路都走不通时（比如权限没给全），通知会暂存起来，'
+                  '你下次打开 App 时自动补弹。',
             ),
             _divider(),
             _faq(
               '小米/红米开了悬浮窗权限还是不弹？',
               'MIUI 把「后台弹出界面」做成了独立权限：\n'
-              '设置 → 应用设置 → 应用管理 → 记账 → 权限管理 → '
-              '打开「后台弹出界面」，同时建议允许「自启动」。',
+                  '设置 → 应用设置 → 应用管理 → 记账 → 权限管理 → '
+                  '打开「后台弹出界面」，同时建议允许「自启动」。',
             ),
             _divider(),
             _faq(
               '为什么有时候没反应？',
               '三种可能：\n'
-              '① 支付宝/微信的通知文案变了，解析规则没跟上\n'
-              '② 系统省电策略把 App 限制了，需要加入后台白名单\n'
-              '③ 支付通知本身没弹出来（有些免密支付不发通知）',
+                  '① 支付宝/微信的通知文案变了，解析规则没跟上\n'
+                  '② 系统省电策略把 App 限制了，需要加入后台白名单\n'
+                  '③ 支付通知本身没弹出来（有些免密支付不发通知）',
             ),
             _divider(),
             _faq(
               '会不会重复记账？',
               '不会。同一笔支付在 3 分钟内只处理一次，'
-              '即使支付宝/微信连发多条通知也只会弹一次。',
+                  '即使支付宝/微信连发多条通知也只会弹一次。',
             ),
             _divider(),
             _faq(
               '识别错了怎么办？',
               '弹窗里所有内容都可以改 —— 金额、分类、备注都能编辑。'
-              '如果实在不想记，点「略过」即可。',
+                  '如果实在不想记，点「略过」即可。',
             ),
             _divider(),
             _faq(
               '会不会误记营销通知？',
               '不会。「优惠券即将过期」「账单已出」「支付失败」'
-              '这类通知会被直接忽略，不会打扰你。',
+                  '这类通知会被直接忽略，不会打扰你。',
             ),
           ]),
-
           const SizedBox(height: 18),
           _sectionTitle('权限说明'),
           _card([
@@ -323,7 +316,7 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
                         icon: const Icon(Icons.settings_outlined, size: 17),
                         label: const Text('去系统设置开启'),
                         style: ElevatedButton.styleFrom(
-                          primary: AppColors.primary,
+                          backgroundColor: AppColors.primary,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(11)),
@@ -352,7 +345,7 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
         gradient: LinearGradient(
           colors: ok
               ? [AppColors.primary, const Color(0xFF00A383)]
-              : [AppColors.textSub, AppColors.textSub.withOpacity(0.8)],
+              : [AppColors.textSub, AppColors.textSub.withValues(alpha: 0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -396,7 +389,7 @@ class _PayDetectSettingsPageState extends State<PayDetectSettingsPage>
               child: ElevatedButton(
                 onPressed: _busy ? null : _openSettings,
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
+                  backgroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(11)),

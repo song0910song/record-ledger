@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -88,9 +89,9 @@ class SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
                 const Spacer(),
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: const [
+                  children: [
                     Text('数据仅存本机',
                         style: TextStyle(fontSize: 11, color: Colors.white70)),
                     SizedBox(height: 2),
@@ -113,8 +114,10 @@ class SettingsPageState extends State<SettingsPage> {
               '感应支付宝/微信支付',
               _paySubtitle(),
               onTap: () async {
-                await Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const PayDetectSettingsPage()));
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const PayDetectSettingsPage()));
                 if (mounted) setState(() {});
               },
             ),
@@ -134,8 +137,10 @@ class SettingsPageState extends State<SettingsPage> {
           _sectionTitle('分类'),
           _card([
             _tile(Icons.category_outlined, '管理分类', '增删分类、改名、换图标',
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const CategoryManagePage()))),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const CategoryManagePage()))),
           ]),
 
           const SizedBox(height: 20),
@@ -210,7 +215,7 @@ class SettingsPageState extends State<SettingsPage> {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: c.withOpacity(0.1),
+                color: c.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(9),
               ),
               child: Icon(icon, size: 16, color: c),
@@ -224,7 +229,8 @@ class SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: danger ? AppColors.danger : AppColors.textMain)),
+                          color:
+                              danger ? AppColors.danger : AppColors.textMain)),
                   if (sub.isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Text(sub,
@@ -235,7 +241,8 @@ class SettingsPageState extends State<SettingsPage> {
               ),
             ),
             if (onTap != null)
-              const Icon(Icons.chevron_right, size: 16, color: AppColors.textSub),
+              const Icon(Icons.chevron_right,
+                  size: 16, color: AppColors.textSub),
           ],
         ),
       ),
@@ -244,8 +251,13 @@ class SettingsPageState extends State<SettingsPage> {
 
   Future<void> _exportCsv() async {
     try {
-      final f = await Db.exportCsv();
-      await Share.shareXFiles([XFile(f.path)], text: '记账数据导出');
+      final path = await Db.exportCsv();
+      // Web 端已直接触发下载，这里只在原生平台走分享
+      if (kIsWeb) {
+        if (mounted) _toast('已开始下载 CSV');
+        return;
+      }
+      await Share.shareXFiles([XFile(path)], text: '记账数据导出');
     } catch (e) {
       if (!mounted) return;
       _toast('导出失败：$e');
@@ -255,10 +267,8 @@ class SettingsPageState extends State<SettingsPage> {
   Future<void> _exportJson() async {
     try {
       final json = await Db.exportJson();
-      final dir = await Db.exportCsv(); // 复用目录
-      // 直接分享文本
-      await Share.share(json.substring(0, json.length > 5000 ? 5000 : json.length));
-      if (dir.path.isEmpty) return;
+      await Share.share(
+          json.substring(0, json.length > 5000 ? 5000 : json.length));
     } catch (e) {
       if (!mounted) return;
       _toast('导出失败：$e');
@@ -286,7 +296,8 @@ class SettingsPageState extends State<SettingsPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('确认清空', style: TextStyle(color: AppColors.danger)),
+            child:
+                const Text('确认清空', style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),

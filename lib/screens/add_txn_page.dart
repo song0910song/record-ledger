@@ -62,7 +62,8 @@ class _AddTxnPageState extends State<AddTxnPage> {
     HapticFeedback.selectionClick();
     setState(() {
       if (k == 'del') {
-        _input = _input.length <= 1 ? '0' : _input.substring(0, _input.length - 1);
+        _input =
+            _input.length <= 1 ? '0' : _input.substring(0, _input.length - 1);
       } else if (k == '.') {
         if (!_input.contains('.')) _input += '.';
       } else {
@@ -165,9 +166,10 @@ class _AddTxnPageState extends State<AddTxnPage> {
           // 时间可改
           TextButton.icon(
             onPressed: _pickTime,
-            icon: const Icon(Icons.access_time, size: 15, color: AppColors.textSub),
+            icon: const Icon(Icons.access_time,
+                size: 15, color: AppColors.textSub),
             label: Text(
-              '${fmtTime(_time)}',
+              fmtTime(_time),
               style: const TextStyle(fontSize: 12, color: AppColors.textSub),
             ),
           ),
@@ -260,7 +262,7 @@ class _AddTxnPageState extends State<AddTxnPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: _category!.color.withOpacity(0.12),
+                color: _category!.color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -306,7 +308,8 @@ class _AddTxnPageState extends State<AddTxnPage> {
 
   Widget _categoryGrid() {
     if (_cats.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const Center(
+          child: CircularProgressIndicator(color: AppColors.primary));
     }
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
@@ -334,11 +337,11 @@ class _AddTxnPageState extends State<AddTxnPage> {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: on ? c.color : c.color.withOpacity(0.1),
+                  color: on ? c.color : c.color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(c.icon,
-                    size: 20, color: on ? Colors.white : c.color),
+                child:
+                    Icon(c.icon, size: 20, color: on ? Colors.white : c.color),
               ),
               const SizedBox(height: 5),
               Text(
@@ -386,7 +389,8 @@ class _AddTxnPageState extends State<AddTxnPage> {
         height: 46,
         alignment: Alignment.center,
         child: k == 'del'
-            ? const Icon(Icons.backspace_outlined, size: 20, color: AppColors.textSub)
+            ? const Icon(Icons.backspace_outlined,
+                size: 20, color: AppColors.textSub)
             : Text(k,
                 style: const TextStyle(
                     fontSize: 22,
@@ -407,13 +411,16 @@ class _AddTxnPageState extends State<AddTxnPage> {
         child: ElevatedButton(
           onPressed: _saving ? null : _save,
           style: ElevatedButton.styleFrom(
-            primary: _category?.color ?? AppColors.primary,
+            backgroundColor: _category?.color ?? AppColors.primary,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           child: const Text('保存',
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white)),
         ),
       ),
     );
