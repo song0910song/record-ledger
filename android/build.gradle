@@ -10,10 +10,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.11.1'
         // Kotlin 编译插件 —— MainActivity.kt 需要它才能编译成 dex 里的类。
         // 缺了它，AndroidManifest 里声明的入口 Activity 不存在，App 启动即闪退。
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.22"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20"
     }
 }
 

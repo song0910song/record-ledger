@@ -383,7 +383,7 @@ class StatsPageState extends State<StatsPage> {
                   drawVerticalLine: false,
                   horizontalInterval: maxY / 3,
                   getDrawingHorizontalLine: (_) =>
-                      FlLine(color: AppColors.divider, strokeWidth: 1),
+                      const FlLine(color: AppColors.divider, strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
                 titlesData: FlTitlesData(
@@ -400,9 +400,9 @@ class StatsPageState extends State<StatsPage> {
                     ),
                   ),
                   rightTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   topTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,

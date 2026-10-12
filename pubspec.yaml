@@ -14,7 +14,7 @@ dependencies:
   path_provider: ^2.0.0
   intl: ^0.17.0
   fl_chart: ^1.2.0
-  share_plus: ^6.3.0
+  share_plus: 13.3.0
   shared_preferences: ^2.0.0
   sqflite_common_ffi_web: ^1.2.0
   web: ^1.1.1
@@ -26,4 +26,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3
+      url_pattern: "https://gh-proxy.com/https://github.com/simolus3/sqlite3.dart/releases/download/$RELEASE_TAG/$FILENAME"
 
